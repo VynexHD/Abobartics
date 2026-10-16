@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abobartics.IO — Resenhudos</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;800&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#24124d;--pri:#7c4dff;--hot:#ff4f8b;--ok:#17c28a;--sun:#ffc531;--card:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:16px Nunito,sans-serif;min-height:100vh;
+background:radial-gradient(circle at 12% 18%,#ff4f8b55 0,transparent 32%),radial-gradient(circle at 88% 12%,#ffc53155 0,transparent 30%),radial-gradient(circle at 70% 90%,#17c28a44 0,transparent 35%),#2a1568}
+h1,h2,h3,b.t{font-family:'Baloo 2',sans-serif;font-weight:800;margin:.2em 0}
+h1{font-size:4rem;line-height:1;background:linear-gradient(90deg,var(--pri),var(--hot),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-2deg);display:inline-block;filter:drop-shadow(3px 3px 0 var(--ink))}
+main{max-width:1120px;margin:auto;padding:16px}
+section{display:none;background:var(--card);border:4px solid var(--ink);border-radius:22px;padding:22px;box-shadow:8px 8px 0 #0008}
+section.on{display:block;animation:in .35s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(14px) scale(.98)}}
+input,button,textarea{font:inherit}
+input:not([type=range]),textarea{border:3px solid var(--ink);border-radius:12px;padding:10px 12px;width:100%;background:#fff}
+input:focus{outline:3px solid var(--sun)}
+label{display:block;font-weight:700;font-size:.9rem}
+button{border:3px solid var(--ink);background:var(--pri);color:#fff;border-radius:12px;padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:transform .08s}
+button:hover:not(:disabled){transform:translateY(-2px)}
+button:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.alt{background:#fff;color:var(--ink)}button.ok{background:var(--ok)}button.hot{background:var(--hot)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}.row>*{flex:1}.row>button{flex:0 0 auto}
+#avs{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;max-height:230px;overflow:auto;padding:8px}
+#avs button{padding:3px;aspect-ratio:1;background:#fff;box-shadow:none}
+#avs button:hover{transform:scale(1.1) rotate(-4deg)}
+#avs button.sel{background:var(--hot);transform:scale(1.12)}
+.av{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.emo{display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.pl{display:flex;align-items:center;gap:10px;padding:6px 12px;border:3px solid var(--ink);border-radius:14px;margin:6px 0;background:#fff;animation:pop .4s}
+.pl .av{width:44px;height:44px;flex:none}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.err{color:#d01;font-weight:800;min-height:1.4em}
+#code{font:800 3.4rem 'Baloo 2';letter-spacing:.2em;color:var(--hot);cursor:pointer;text-shadow:3px 3px 0 var(--ink)}
+#bar{display:flex;justify-content:space-between;gap:10px;max-width:1120px;margin:14px auto 0;padding:10px 18px;background:var(--ink);color:#fff;border-radius:16px;font-weight:800;border:3px solid #fff3}
+#tm{font:800 1.5rem 'Baloo 2';background:var(--sun);color:var(--ink);border-radius:10px;padding:0 12px}
+#tm.low{background:var(--hot);color:#fff;animation:pulse .5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+.dw{display:grid;grid-template-columns:1fr 260px;gap:14px}
+@media(max-width:820px){.dw{grid-template-columns:1fr}h1{font-size:3rem}}
+#wrap{width:100%;aspect-ratio:10/7;overflow:auto;border:4px solid var(--ink);border-radius:14px;background:#cfc8e8}
+#stack{position:relative;width:100%;aspect-ratio:10/7;background:#fff;touch-action:none;cursor:crosshair}
+#lys{display:contents}#stack canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+.tools button{padding:6px 12px}
+aside{display:flex;flex-direction:column;gap:10px}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tg button{padding:6px;background:#fff;color:var(--ink);box-shadow:0 3px 0 var(--ink);font-size:.85rem}
+.tg button.sel{background:var(--hot);color:#fff}
+.cw{display:flex;gap:10px;align-items:center}
+#wheel{border-radius:50%;cursor:crosshair;border:3px solid var(--ink)}
+#sw{flex:1;height:60px;border:3px solid var(--ink);border-radius:12px;background:repeating-conic-gradient(#ddd 0 25%,#fff 0 50%) 0 0/14px 14px;position:relative;overflow:hidden}
+#sw i{position:absolute;inset:0}
+#lyp{border:3px solid var(--ink);border-radius:12px;padding:8px;background:#fff}
+.lh{display:flex;justify-content:space-between;align-items:center}.lh button{padding:2px 10px}
+.lr{display:flex;align-items:center;gap:4px;padding:3px;border-radius:8px;cursor:pointer;margin-top:4px;border:2px solid transparent}
+.lr.sel{background:#e9e0ff;border-color:var(--pri)}.lr span{flex:1;font-size:.85rem;font-weight:700}
+.lr button{padding:0 6px;font-size:.8rem;box-shadow:none;background:#fff;color:var(--ink);border-width:2px}
+.big{font-size:1.6rem;text-align:center;margin-bottom:8px}
+.card{border:3px solid var(--ink);border-radius:16px;padding:12px;margin:14px 0;background:#fff}
+.step{display:flex;gap:12px;align-items:flex-start;margin:10px 0}.step .av{width:48px;height:48px;flex:none}
+.step b.t{font-size:1.5rem}.step img.d{width:100%;max-width:560px;border:3px solid var(--ink);border-radius:10px;display:block}
+.step.an{animation:pop .5s}.step.an img.d{animation:drop .8s cubic-bezier(.2,1.4,.4,1)}
+@keyframes drop{from{transform:translateY(-40px) rotate(-6deg) scale(.5);opacity:0}}
+#st{min-height:360px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#st .step{width:100%;max-width:640px}
+.banner{text-align:center;animation:pop .6s}.banner b{font-size:2.4rem;color:var(--hot)}
+</style></head><body>
+<div id="bar" hidden><span id="ttl"></span><span id="prog"></span><span id="tm"></span></div>
+<main>
+<section id="home" class="on">
+  <h1>Abobartics.IO</h1>
+  <p>Escreva uma frase, desenhe a de outro jogador e adivinhe o desenho de um terceiro. De 3 a 8 jogadores.</p>
+  <input id="nm" maxlength="14" placeholder="Seu nome">
+  <p><b>Escolha seu avatar</b></p><div id="avs"></div>
+  <div class="row"><button id="goCreate">Criar sala</button></div>
+  <div class="row"><input id="cd" maxlength="5" placeholder="Código da sala" style="text-transform:uppercase"><button id="join" class="ok">Entrar</button></div>
+  <div class="err" id="e1"></div>
+</section>
+
+<section id="create">
+  <h2>Configurar partida</h2><div id="cset"></div>
+  <div class="err" id="e2"></div>
+  <div class="row"><button class="alt" id="back">Voltar</button><button id="mk" class="ok">Criar sala</button></div>
+</section>
+
+<section id="lobby">
+  <h2>Sala de espera</h2>
+  <p>Passe este código aos amigos (clique para copiar):</p>
+  <div id="code"></div><div id="pls"></div>
+  <div id="lsw" hidden class="card"><h3>⚙️ Configurações da partida</h3><div id="lset"></div><button id="sv" class="alt">Salvar configurações</button></div>
+  <div id="set"></div><div class="err" id="e3"></div>
+  <button id="start" class="ok">Começar</button> <span id="lw"></span>
+</section>
+
+<section id="s0">
+  <h2>Escreva uma frase para o próximo desenhar</h2>
+  <input id="wr" maxlength="120" placeholder="Ex.: um gato astronauta comendo pizza">
+  <div class="row"><button id="rd0" class="ok" disabled>✅ Pronto</button></div>
+</section>
+
+<section id="s1">
+  <div class="big">Desenhe: <b class="t" id="pr"></b></div>
+  <div class="dw"><div>
+    <div id="wrap"><div id="stack"><div id="lys"></div><canvas id="pv" width="1000" height="700"></canvas></div></div>
+    <div class="tools">
+      <button class="alt" id="zo">➖</button><b id="zv">100%</b><button class="alt" id="zi">➕</button>
+      <button class="alt" id="un">↩️ Desfazer</button><button class="alt" id="cl">🗑️ Limpar camada</button>
+      <button class="ok" id="rd1" style="margin-left:auto">✅ Pronto</button>
+    </div>
+    <small>⌨️ Ctrl+Z desfaz · botão direito = pipeta · L lápis, B pincel, M marcador, S spray, G balde, E borracha, I pipeta · [ ] tamanho · 1–9 e 0 opacidade · N nova camada · segurar Espaço move · + − zoom</small></div>
+    <aside>
+      <div class="tg" id="tl">
+        <button data-t="lapis" class="sel">✏️ Lápis</button><button data-t="pincel">🖌️ Pincel</button>
+        <button data-t="marcador">🖍️ Marcador</button><button data-t="spray">💨 Spray</button>
+        <button data-t="balde">🪣 Balde</button><button data-t="pipeta">💉 Pipeta</button>
+        <button data-t="borracha">🧽 Borracha</button><button data-t="mao">✋ Mover</button>
+      </div>
+      <label>Tamanho <input type="range" id="sz" min="1" max="60" value="6"></label>
+      <label>Opacidade <b id="opv">100%</b><input type="range" id="op" min="5" max="100" value="100"></label>
+      <div class="cw"><canvas id="wheel" width="160" height="160"></canvas><div id="sw"><i></i></div></div>
+      <label>Brilho <input type="range" id="br" min="0" max="100" value="0"></label>
+      <div id="lyp"><div class="lh"><b>Camadas</b><button id="la">＋</button></div><div id="ll"></div></div>
+    </aside>
+  </div>
+</section>
+
+<section id="s2">
+  <h2>O que é este desenho?</h2>
+  <div id="gbox"></div>
+  <input id="gs" maxlength="120" placeholder="Sua resposta">
+  <div class="row"><button id="rd2" class="ok" disabled>✅ Pronto</button></div>
+</section>
+
+<section id="rev">
+  <h2 id="rt"></h2>
+  <div id="st"></div><div class="row"><button id="skip" class="alt">⏭ Pular animação</button></div>
+  <div id="sm" hidden><div id="rv"></div>
+    <div class="row"><button id="gl" class="ok">🔁 Jogar de novo (editar na sala)</button></div>
+    <div id="rw"></div></div>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const EMO = ['🐸','🐙','🦄','🐵','🦖','👻','🍕','🤖'];
+let ws, me = '', phase = -1, step = 0, sub = false, deadline = 0, avatar = 'foto1.png', hostId = '', rvT, rvM;
+
+function av(f) {
+  const i = new Image(); i.src = 'Pictures/' + f; i.className = 'av';
+  i.onerror = () => { const s = document.createElement('span'); s.className = 'av emo'; s.textContent = EMO[((parseInt(f.slice(4)) || 1) - 1) % 8]; i.replaceWith(s); };
+  return i;
+}
+function show(id) { document.querySelectorAll('section').forEach(s => s.classList.toggle('on', s.id === id)); $('bar').hidden = !['s0', 's1', 's2'].includes(id); }
+
+/* avatares: lê todos os fotoN da pasta Pictures automaticamente */
+fetch('/api/avatars').then(r => r.json()).catch(() => []).then(l => {
+  if (!l.length) l = Array.from({ length: 8 }, (_, i) => `foto${i + 1}.png`);
+  avatar = l[0];
+  l.forEach((f, k) => {
+    const b = document.createElement('button'); b.append(av(f)); if (!k) b.className = 'sel';
+    b.onclick = () => { avatar = f; [...$('avs').children].forEach(c => c.classList.toggle('sel', c === b)); };
+    $('avs').append(b);
+  });
+});
+
+/* configurações (criação e sala) */
+const SH = p => `<div class="row"><label>Partidas (1–10)<input id="${p}g" inputmode="numeric"></label><label>Escrever (s, mín. 30)<input id="${p}w" inputmode="numeric"></label></div><div class="row"><label>Desenhar (s, mín. 300)<input id="${p}d" inputmode="numeric"></label><label>Adivinhar (s, mín. 60)<input id="${p}s" inputmode="numeric"></label></div>`;
+const fillSet = (p, s) => [['g', s.games], ['w', s.w], ['d', s.d], ['s', s.g]].forEach(([k, v]) => $(p + k).value = v);
+function readSet(p, eid) {
+  const f = [['g', 1, 'partidas'], ['w', 30, 'tempo de escrever'], ['d', 300, 'tempo de desenhar'], ['s', 60, 'tempo de adivinhar']], v = [];
+  for (const [k, min, n] of f) {
+    const s = $(p + k).value.trim();
+    if (!/^\d+$/.test(s)) { $(eid).textContent = `Use apenas números em "${n}".`; return null; }
+    if (+s < min) { $(eid).textContent = `O mínimo para "${n}" é ${min}.`; return null; }
+    v.push(+s);
+  }
+  $(eid).textContent = ''; return { games: v[0], w: v[1], d: v[2], g: v[3] };
+}
+$('cset').innerHTML = SH('xc_'); $('lset').innerHTML = SH('xl_'); fillSet('xc_', { games: 3, w: 30, d: 300, g: 60 });
+
+function connect(first) {
+  if (ws && ws.readyState === 1) return ws.send(JSON.stringify(first));
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host);
+  ws.onopen = () => ws.send(JSON.stringify(first));
+  ws.onmessage = e => handle(JSON.parse(e.data));
+  ws.onclose = () => { if (me) { alert('Conexão perdida.'); location.reload(); } };
+}
+const tx = o => ws.send(JSON.stringify(o));
+const name = () => $('nm').value.trim();
+$('goCreate').onclick = () => { if (!name()) return $('e1').textContent = 'Digite um nome primeiro.'; $('e1').textContent = ''; show('create'); };
+$('back').onclick = () => show('home');
+$('join').onclick = () => {
+  if (!name()) return $('e1').textContent = 'Digite um nome.';
+  if (!$('cd').value.trim()) return $('e1').textContent = 'Digite o código da sala.';
+  connect({ t: 'join', name: name(), av: avatar, code: $('cd').value });
+};
+$('mk').onclick = () => { const set = readSet('xc_', 'e2'); if (set) connect({ t: 'create', name: name(), av: avatar, set }); };
+$('sv').onclick = () => { const set = readSet('xl_', 'e3'); if (set) tx({ t: 'set', set }); };
+$('code').onclick = () => navigator.clipboard?.writeText($('code').textContent);
+$('start').onclick = () => tx({ t: 'start' });
+$('gl').onclick = () => tx({ t: 'next', lobby: true });
+
+function handle(m) {
+  if (m.t === 'err') { const id = ['e1', 'e2', 'e3'].find(i => $(i).closest('section').classList.contains('on')); if (id) $(id).textContent = m.msg; }
+  else if (m.t === 'joined') me = m.id;
+  else if (m.t === 'lobby') {
+    hostId = m.host; clearTimeout(rvT); show('lobby'); $('code').textContent = m.code;
+    $('set').textContent = `${m.set.games} partida(s) · escrever ${m.set.w}s · desenhar ${m.set.d}s · adivinhar ${m.set.g}s`;
+    $('pls').innerHTML = '';
+    m.players.forEach(p => { const d = document.createElement('div'); d.className = 'pl'; d.append(av(p.av), document.createTextNode(p.name + (p.id === m.host ? ' 👑' : ''))); $('pls').append(d); });
+    const host = me === m.host;
+    $('lsw').hidden = !host; if (host && !$('lsw').contains(document.activeElement)) fillSet('xl_', m.set);
+    $('start').hidden = !host; $('start').disabled = m.players.length < 3;
+    $('lw').textContent = `${m.players.length}/8 jogadores` + (m.players.length < 3 ? ` — faltam ${3 - m.players.length} para começar` : '') + (host ? '' : ' — aguardando o dono da sala');
+  }
+  else if (m.t === 'phase') {
+    clearTimeout(rvT); step = m.phase; phase = m.kind; sub = false; deadline = Date.now() + m.secs * 1000;
+    $('ttl').textContent = ['✏️ Escrever', '🎨 Desenhar', '🔍 Adivinhar'][phase] + ` · ${m.game ? `Partida ${m.game}/${m.total}` : 'Frase inicial'} · Etapa ${m.phase + 1}/${m.n}`; $('prog').textContent = '';
+    if (phase === 0) { $('wr').value = ''; $('wr').disabled = false; $('rd0').disabled = true; lock(false); show('s0'); $('wr').focus(); }
+    if (phase === 1) { $('pr').textContent = m.prompt || '(sem frase — desenhe o que quiser!)'; initCanvas(); lock(false); show('s1'); }
+    if (phase === 2) {
+      $('gbox').innerHTML = '';
+      if (m.prompt) { const i = new Image(); i.src = m.prompt; i.style.cssText = 'width:100%;max-width:600px;border:3px solid #24124d;border-radius:12px;margin:0 auto 12px;display:block'; $('gbox').append(i); } else $('gbox').textContent = '(ninguém desenhou)';
+      $('gs').value = ''; $('gs').disabled = false; $('rd2').disabled = true; lock(false); show('s2'); $('gs').focus();
+    }
+  }
+  else if (m.t === 'prog') $('prog').textContent = `${m.n}/${m.total} prontos`;
+  else if (m.t === 'timeup') { if (phase >= 0) { sub = true; tx({ t: 'submit', phase: step, data: curData(), ready: true }); } }
+  else if (m.t === 'reveal') playReveal(m);
+  else if (m.t === 'skip') { if (rvM) finish(); }
+}
+
+/* pronto / editar */
+const curData = () => phase === 0 ? $('wr').value : phase === 1 ? comp().toDataURL('image/jpeg', .7) : $('gs').value;
+function lock(on) {
+  const rd = $(['rd0', 'rd1', 'rd2'][phase]); rd.textContent = on ? '✏️ Editar' : '✅ Pronto'; rd.classList.toggle('alt', on);
+  if (phase === 0) $('wr').disabled = on; if (phase === 2) $('gs').disabled = on;
+}
+function ready() {
+  if (!sub) { if (phase !== 1 && !(phase === 0 ? $('wr') : $('gs')).value.trim()) return; sub = true; tx({ t: 'submit', phase: step, data: curData(), ready: true }); lock(true); }
+  else { sub = false; tx({ t: 'submit', phase: step, ready: false }); lock(false); }
+}
+['rd0', 'rd1', 'rd2'].forEach(id => $(id).onclick = ready);
+$('wr').oninput = () => $('rd0').disabled = !$('wr').value.trim();
+$('gs').oninput = () => $('rd2').disabled = !$('gs').value.trim();
+$('wr').onkeydown = e => { if (e.key === 'Enter' && !$('rd0').disabled && !sub) ready(); };
+$('gs').onkeydown = e => { if (e.key === 'Enter' && !$('rd2').disabled && !sub) ready(); };
+setInterval(() => {
+  if (phase < 0) return; const s = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+  $('tm').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); $('tm').classList.toggle('low', s <= 10);
+}, 250);
+
+/* revelação animada */
+function stepEl(it, p, an) {
+  const s = document.createElement('div'); s.className = 'step' + (an ? ' an' : ''); s.append(av(it.av));
+  const b = document.createElement('div'), sm = document.createElement('small');
+  sm.textContent = `${it.by} ${['escreveu', 'desenhou', 'achou que era'][p === 0 ? 0 : p % 2 ? 1 : 2]}`; b.append(sm, document.createElement('br'));
+  if (p % 2 === 1 && it.d) { const i = new Image(); i.src = it.d; i.className = 'd'; b.append(i); }
+  else { const t = document.createElement('b'); t.className = 't'; t.textContent = it.d || '—'; b.append(t); }
+  s.append(b); return s;
+}
+function playReveal(m) {
+  phase = -1; rvM = m; hostId = m.host; show('rev'); $('rt').textContent = 'Resultado final';
+  $('sm').hidden = true; $('skip').parentElement.hidden = me !== m.host; $('st').innerHTML = '';
+  const q = [];
+  m.chains.forEach((c, ci) => {
+    q.push([() => { $('st').innerHTML = `<div class="banner"><small>Corrente ${ci + 1} de ${m.chains.length}</small><br><b class="t">Tudo começou com ${c.items[0].by.replace(/[<>]/g, '')}…</b></div>`; }, 2200]);
+    c.items.forEach((it, p) => q.push([() => { if (p === 0) $('st').innerHTML = ''; const el = stepEl(it, p, true); $('st').append(el); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, p % 2 === 1 ? 4500 : 3500]));
+  });
+  const run = i => { if (i >= q.length) return finish(); q[i][0](); rvT = setTimeout(() => run(i + 1), q[i][1]); };
+  run(0);
+}
+function finish() {
+  clearTimeout(rvT); $('st').innerHTML = ''; $('skip').parentElement.hidden = true; $('sm').hidden = false; $('rv').innerHTML = '';
+  rvM.chains.forEach(c => { const d = document.createElement('div'); d.className = 'card'; c.items.forEach((it, p) => d.append(stepEl(it, p, false))); $('rv').append(d); });
+  const host = me === hostId; $('gl').hidden = !host; $('rw').textContent = host ? '' : 'Aguardando o dono da sala…';
+}
+$('skip').onclick = () => tx({ t: 'skip' });
+
+/* ---------- Desenho: camadas, opacidade, pipeta ---------- */
+const stk = $('stack'), pv = $('pv'), px = pv.getContext('2d'), wrap = $('wrap');
+let L = [], act, nl = 0, tool = 'lapis', prevTool = 'lapis', color = '#000000', hue = 0, sat = 0, op = 1, zoom = 1, down = false, last, hist = [], pan;
+
+const pos = e => { const r = stk.getBoundingClientRect(); return [(e.clientX - r.left) * 1000 / r.width, (e.clientY - r.top) * 700 / r.height]; };
+const syncDom = () => $('lys').replaceChildren(...L.map(l => l.c));
+function addLayer() {
+  if (L.length >= 6) return;
+  const c = document.createElement('canvas'); c.width = 1000; c.height = 700;
+  act = { c, x: c.getContext('2d', { willReadFrequently: true }), v: true, n: 'Camada ' + (++nl) }; L.push(act); syncDom(); drawLL();
+}
+function drawLL() {
+  const ll = $('ll'); ll.innerHTML = '';
+  [...L].reverse().forEach(l => {
+    const i = L.indexOf(l), r = document.createElement('div'); r.className = 'lr' + (l === act ? ' sel' : '');
+    const mk = (t, f, dis) => { const b = document.createElement('button'); b.textContent = t; b.disabled = !!dis; b.onclick = ev => { ev.stopPropagation(); f(); }; r.append(b); };
+    mk(l.v ? '👁' : '🚫', () => { l.v = !l.v; l.c.style.display = l.v ? '' : 'none'; drawLL(); });
+    const s = document.createElement('span'); s.textContent = l.n; r.append(s);
+    mk('↑', () => mv(i, 1), i === L.length - 1); mk('↓', () => mv(i, -1), i === 0); mk('✖', () => del(l), L.length === 1);
+    r.onclick = () => { act = l; drawLL(); }; ll.append(r);
+  });
+}
+function mv(i, d) { [L[i], L[i + d]] = [L[i + d], L[i]]; syncDom(); drawLL(); }
+function del(l) { L = L.filter(x => x !== l); hist = hist.filter(h => h.l !== l); if (act === l) act = L[L.length - 1]; syncDom(); drawLL(); }
+$('la').onclick = addLayer;
+function initCanvas() { L = []; nl = 0; hist = []; pv.style.opacity = 1; addLayer(); setZoom(1); }
+function comp() {
+  const c = document.createElement('canvas'); c.width = 1000; c.height = 700; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, 1000, 700); L.forEach(l => l.v && x.drawImage(l.c, 0, 0)); return c;
+}
+const snap = () => { hist.push({ l: act, d: act.x.getImageData(0, 0, 1000, 700) }); if (hist.length > 15) hist.shift(); };
+$('un').onclick = () => { const h = hist.pop(); if (h) h.l.x.putImageData(h.d, 0, 0); };
+$('cl').onclick = () => { snap(); act.x.clearRect(0, 0, 1000, 700); };
+
+function hsv(h, s, v) { const f = n => { const k = (n + h * 6) % 6; return Math.round(255 * (v - v * s * Math.max(0, Math.min(k, 4 - k, 1)))); }; return [f(5), f(3), f(1)]; }
+const hex = a => '#' + a.map(x => x.toString(16).padStart(2, '0')).join('');
+const unhex = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+function upColor() { color = hex(hsv(hue, sat, +$('br').value / 100)); op = +$('op').value / 100; $('opv').textContent = Math.round(op * 100) + '%'; $('sw').firstChild.style.background = `rgba(${unhex(color)},${op})`; }
+function setRGB([r, g, b]) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0;
+  if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h / 6 + 1) % 1; }
+  hue = h; sat = mx ? d / mx : 0; $('br').value = Math.round(mx / 255 * 100); upColor();
+}
+function selTool(t) { if (t !== 'pipeta') prevTool = t; tool = t; $('tl').querySelectorAll('[data-t]').forEach(x => x.classList.toggle('sel', x.dataset.t === t)); stk.style.cursor = t === 'mao' ? 'grab' : 'crosshair'; }
+$('tl').querySelectorAll('[data-t]').forEach(b => b.onclick = () => selTool(b.dataset.t));
+$('br').oninput = $('op').oninput = upColor;
+
+function stroke(c, a, b, erase) {
+  const sz = +$('sz').value; c.save(); c.lineCap = c.lineJoin = 'round';
+  c.strokeStyle = c.fillStyle = erase ? '#000' : color; c.lineWidth = sz;
+  if (erase) c.globalCompositeOperation = 'destination-out';
+  if (tool === 'marcador') { c.lineCap = 'square'; c.lineWidth = sz * 2; }
+  if (tool === 'pincel') { c.shadowColor = color; c.shadowBlur = sz * .8; }
+  if (tool === 'spray') {
+    const n = Math.max(1, Math.hypot(b[0] - a[0], b[1] - a[1]) / 3 | 0);
+    for (let k = 0; k <= n; k++) { const x = a[0] + (b[0] - a[0]) * k / n, y = a[1] + (b[1] - a[1]) * k / n;
+      for (let j = 0; j < sz; j++) { const t = Math.random() * 6.28, r = Math.random() * sz * 2; c.fillRect(x + Math.cos(t) * r, y + Math.sin(t) * r, 1.5, 1.5); } }
+  } else { c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0] + .01, b[1]); c.stroke(); }
+  c.restore();
+}
+function flood([x, y]) {
+  const W = 1000, H = 700, d = comp().getContext('2d').getImageData(0, 0, W, H).data, i0 = ((y | 0) * W + (x | 0)) * 4, t = [d[i0], d[i0 + 1], d[i0 + 2]];
+  const ok = i => Math.abs(d[i] - t[0]) + Math.abs(d[i + 1] - t[1]) + Math.abs(d[i + 2] - t[2]) < 60;
+  const m = new Uint8Array(W * H), s = [(y | 0) * W + (x | 0)];
+  while (s.length) {
+    const p = s.pop(); if (m[p]) continue; if (!ok(p * 4)) { m[p] = 2; continue; } m[p] = 1;
+    const px = p % W; if (px > 0) s.push(p - 1); if (px < W - 1) s.push(p + 1); if (p >= W) s.push(p - W); if (p < W * (H - 1)) s.push(p + W);
+  }
+  const im = new ImageData(W, H), c = unhex(color);
+  for (let p = 0; p < W * H; p++) if (m[p] === 1) im.data.set([c[0], c[1], c[2], 255], p * 4);
+  const tc = document.createElement('canvas'); tc.width = W; tc.height = H; tc.getContext('2d').putImageData(im, 0, 0);
+  act.x.globalAlpha = op; act.x.drawImage(tc, 0, 0); act.x.globalAlpha = 1;
+}
+const effAlpha = () => op * (tool === 'marcador' ? .5 : 1);
+const pick = p => setRGB(comp().getContext('2d').getImageData(p[0] | 0, p[1] | 0, 1, 1).data);
+stk.oncontextmenu = e => e.preventDefault();
+stk.onpointerdown = e => {
+  if (sub) return; stk.setPointerCapture(e.pointerId);
+  if (e.button === 2) { pick(pos(e)); return; }
+  if (tool === 'mao' || e.button === 1) { pan = { x: e.clientX, y: e.clientY, l: wrap.scrollLeft, t: wrap.scrollTop }; return; }
+  const p = pos(e);
+  if (tool === 'pipeta') { pick(p); selTool(prevTool); return; }
+  snap(); if (tool === 'balde') return flood(p);
+  down = true; last = p; pv.style.opacity = effAlpha();
+  stroke(tool === 'borracha' ? act.x : px, p, p, tool === 'borracha');
+};
+stk.onpointermove = e => {
+  if (pan) { wrap.scrollLeft = pan.l - (e.clientX - pan.x); wrap.scrollTop = pan.t - (e.clientY - pan.y); return; }
+  if (!down) return; const p = pos(e); stroke(tool === 'borracha' ? act.x : px, last, p, tool === 'borracha'); last = p;
+};
+stk.onpointerup = stk.onpointercancel = () => {
+  if (down && tool !== 'borracha') { act.x.globalAlpha = effAlpha(); act.x.drawImage(pv, 0, 0); act.x.globalAlpha = 1; px.clearRect(0, 0, 1000, 700); }
+  down = false; pan = null;
+};
+function setZoom(z) {
+  const fx = (wrap.scrollLeft + wrap.clientWidth / 2) / wrap.scrollWidth, fy = (wrap.scrollTop + wrap.clientHeight / 2) / wrap.scrollHeight;
+  zoom = Math.min(8, Math.max(1, z)); stk.style.width = zoom * 100 + '%'; $('zv').textContent = Math.round(zoom * 100) + '%';
+  wrap.scrollLeft = fx * wrap.scrollWidth - wrap.clientWidth / 2; wrap.scrollTop = fy * wrap.scrollHeight - wrap.clientHeight / 2;
+}
+$('zi').onclick = () => setZoom(zoom * 1.5); $('zo').onclick = () => setZoom(zoom / 1.5);
+wrap.onwheel = e => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZoom(zoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2)); } };
+
+/* roleta de cores */
+const wc = $('wheel'), wx = wc.getContext('2d');
+(function () {
+  const im = wx.createImageData(160, 160);
+  for (let y = 0; y < 160; y++) for (let x = 0; x < 160; x++) {
+    const dx = x - 80, dy = y - 80, r = Math.hypot(dx, dy); if (r > 79) continue;
+    im.data.set([...hsv((Math.atan2(dy, dx) / 6.2832 + 1) % 1, r / 79, 1), 255], (y * 160 + x) * 4);
+  }
+  wx.putImageData(im, 0, 0);
+})();
+wc.onpointerdown = wc.onpointermove = e => {
+  if (e.type === 'pointermove' && !(e.buttons & 1)) return;
+  const r = wc.getBoundingClientRect(), dx = e.clientX - r.left - r.width / 2, dy = e.clientY - r.top - r.height / 2;
+  hue = (Math.atan2(dy, dx) / 6.2832 + 1) % 1; sat = Math.min(1, Math.hypot(dx, dy) / (r.width / 2));
+  if (+$('br').value === 0) $('br').value = 100; upColor();
+};
+upColor();
+
+/* atalhos de teclado */
+let spaceOn = false, spaceBack = 'lapis';
+const KT = { l: 'lapis', b: 'pincel', m: 'marcador', s: 'spray', g: 'balde', e: 'borracha', i: 'pipeta', h: 'mao' };
+addEventListener('keydown', e => {
+  if (phase !== 1 || (/INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range')) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); if (!sub) $('un').click(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey || sub) return;
+  if (k === ' ') { e.preventDefault(); if (!spaceOn && tool !== 'mao') { spaceOn = true; spaceBack = tool; selTool('mao'); } return; }
+  if (KT[k]) selTool(KT[k]);
+  else if (k === '[' || k === ']') { $('sz').value = +$('sz').value + (k === ']' ? 4 : -4); }
+  else if (k >= '0' && k <= '9') { $('op').value = k === '0' ? 100 : +k * 10; upColor(); }
+  else if (k === 'n') addLayer();
+  else if (k === '+' || k === '=') setZoom(zoom * 1.3);
+  else if (k === '-') setZoom(zoom / 1.3);
+});
+addEventListener('keyup', e => {
+  if (e.key === ' ' && phase === 1 && !/INPUT|TEXTAREA/.test(e.target.tagName)) { e.preventDefault(); if (spaceOn) { spaceOn = false; selTool(spaceBack); } }
+});
+/* mantém a conexão viva enquanto espera */
+setInterval(() => { if (ws && ws.readyState === 1) tx({ t: 'ping' }); }, 20000);
+</script>
+</body></html>
